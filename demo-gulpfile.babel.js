@@ -1,8 +1,8 @@
 var gulp = require('gulp'),
   sass = require('gulp-sass'),
   neat = require('node-neat'),
-  styleguide = require('./lib/styleguide'),
-  source = 'lib/app/**/*.scss',
+  styleguide = require('./dist/styleguide'),
+  source = 'dist/app/**/*.scss',
   outputPath = 'demo-output';
 
 gulp.task('styleguide:generate', function() {
@@ -18,7 +18,7 @@ gulp.task('styleguide:generate', function() {
 });
 
 gulp.task('styleguide:applystyles', function() {
-  return gulp.src('lib/app/sass/styleguide-app.scss')
+  return gulp.src('dist/app/sass/styleguide-app.scss')
     .pipe(sass({
       errLogToConsole: true,
       includePaths: neat.includePaths
@@ -30,7 +30,7 @@ gulp.task('styleguide:applystyles', function() {
 gulp.task('styleguide', ['styleguide:static', 'styleguide:generate', 'styleguide:applystyles']);
 
 gulp.task('styleguide:static', function() {
-  gulp.src(['lib/demo/**'])
+  gulp.src(['dist/demo/**'])
     .pipe(gulp.dest(outputPath + '/demo'));
 });
 

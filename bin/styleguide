@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 var path = require('path'),
-    cli = require(path.resolve(__dirname, '../lib/modules/cli')),
+    cli = require(path.resolve(__dirname, '../dist/modules/cli')),
     yargs = require('yargs'),
     args = cli.argv(yargs).argv;
 

@@ -8,12 +8,13 @@ var gulp = require('gulp'),
     replace = require('gulp-replace'),
     runSequence = require('run-sequence'),
     toc = require('gulp-doctoc'),
-    styleguide = require('./lib/styleguide'),
+    styleguide = require('./dist/styleguide'),
     sass = require('gulp-sass'),
     please = require('gulp-pleeease'),
     neat = require('node-neat'),
     rimraf = require('gulp-rimraf'),
-    distPath = 'lib/dist',
+    //distPath = 'lib/dist',
+    distPath = 'dist',
     fs = require('fs'),
     chalk = require('chalk'),
     outputPath = 'demo-output';
@@ -30,14 +31,14 @@ gulp.task('js:app', () => {
   .pipe(plumber())
   .pipe(ngAnnotate())
   .pipe(concat('app.js'))
-  .pipe(gulp.dest(distPath + '/js'));
+  .pipe(gulp.dest(distPath + '/app/js/'));
 });
 
 gulp.task('js:vendor', ['bower'], () => {
   return gulp.src(['lib/app/js/vendor/**/*.js'].concat(mainBowerFiles({filter: /\.js/})))
     .pipe(plumber())
     .pipe(concat('vendor.js'))
-    .pipe(gulp.dest(distPath + '/js'));
+    .pipe(gulp.dest(distPath + '/app/js'));
 });
 
 gulp.task('bower', () => {
@@ -46,17 +47,17 @@ gulp.task('bower', () => {
 
 gulp.task('copy:sass', () => {
   return gulp.src('lib/app/sass/**/*')
-    .pipe(gulp.dest(distPath + '/sass'));
+    .pipe(gulp.dest(distPath + '/app/sass'));
 });
 
 gulp.task('html', () => {
   return gulp.src('lib/app/**/*.html')
-    .pipe(gulp.dest(distPath + '/'));
+    .pipe(gulp.dest(distPath + '/app'));
 });
 
 gulp.task('assets', () => {
   return gulp.src('lib/app/assets/**')
-    .pipe(gulp.dest(distPath + '/assets'));
+    .pipe(gulp.dest(distPath + '/app/assets'));
 });
 
 gulp.task('clean:dist', function () {
@@ -111,6 +112,7 @@ gulp.task('dev', ['dev:doc', 'dev:static', 'dev:applystyles' ], () => {
   // Do intial full build and create styleguide
   runSequence('build:dist', 'dev:generate');
 
+  gulp.watch(['lib/*.js', 'lib/modules/**/*.js'], ['build:dist:processor']);
   gulp.watch('lib/app/sass/**/*.scss', () => {
     runSequence('copy:sass', 'dev:applystyles', 'dev:generate');
   });
@@ -128,7 +130,37 @@ gulp.task('dev', ['dev:doc', 'dev:static', 'dev:applystyles' ], () => {
   gulp.watch('lib/styleguide.js', ['dev:generate']);
 });
 
-gulp.task('build:dist', ['copy:sass', 'js:app', 'js:vendor', 'html', 'assets']);
+gulp.task('build:dist:app', [
+    'copy:sass',
+    'js:app',
+    'js:vendor',
+    'html',
+    'assets'
+]);
+
+gulp.task('build:dist:processor', () => {
+  let babel = require('gulp-babel');
+  gulp.src(['lib/*.js', 'lib/modules/**/*.js'], {base: 'lib/'})
+    .pipe(babel())
+    .pipe(gulp.dest(distPath));
+});
+
+gulp.task('build:dist:md', () => {
+  gulp.src(['lib/*.md'], {base: 'lib/'})
+    .pipe(gulp.dest(distPath));
+});
+
+gulp.task('build:dist:demo', () => {
+  gulp.src('lib/demo/**/*')
+    .pipe(gulp.dest(distPath + '/demo'));
+});
+
+gulp.task('build:dist', [
+    'build:dist:processor',
+    'build:dist:md',
+    'build:dist:demo',
+    'build:dist:app'
+]);
 
 gulp.task('build', ['clean:dist'], () => {
   runSequence('build:dist');

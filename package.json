@@ -14,7 +14,7 @@
     "type": "git",
     "url": "https://github.com/SC5/sc5-styleguide.git"
   },
-  "main": "./lib/styleguide.js",
+  "main": "./dist/styleguide.js",
   "files": [
     "bin/",
     "lib/",
@@ -102,7 +102,7 @@
     "posttest": "gulp generate-coverage-report",
     "prepublish": "gulp build",
     "build": "gulp build",
-    "demo": "gulp --gulpfile ./demo-gulpfile.js watch",
+    "demo": "gulp --gulpfile ./demo-gulpfile.babel.js watch",
     "depcheck": "dependency-check . --unused --no-dev --entry gulpfile.js --entry demo-gulpfile.js --entry lib/styleguide.js"
   }
 }
